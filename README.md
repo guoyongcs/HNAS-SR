@@ -25,7 +25,7 @@ The HNAS work can be splitted into four procedures:
     CUDA_VISIBLE_DEVICES=0 python search.py --model ENAS --scale 2 --patch_size 96 --save search_model --reset --data_test Set5 --layers 12 --init_channels 8 --entropy_coeff 1 --lr 0.001 --epoch 400 --flops_scale 0.2
     ```
 
-2. At search stage, we infer some promising architectures.(optional)
+2. At infer stage, we infer some promising architectures.(optional)
     ```bash
     CUDA_VISIBLE_DEVICES=0 python derive.py --data_test Set5 --scale 2 --pre_train  ../experiment/search_model/model/model_best.pt  --test_only --self_ensemble --save_results --save result/ --train_controller False --model ENAS --layer 12 --init_channels 8 --seed 1  
     ```
