@@ -9,7 +9,7 @@
 
 
 ## Quick start 
-Place the SR dataset to the path of  'dir_data' as defined in  the option.py file.  
+Place the SR datasets to the path of  'dir_data' as defined in  the option.py file.  
 Run the following command to quick start our project
 
 
