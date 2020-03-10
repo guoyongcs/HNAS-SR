@@ -80,8 +80,8 @@ HNAS_A = Genotype(normal=[('skip_connect', 1, 2), ('sep_conv_5x5', 1, 2), ('dil_
 HNAS_B = Genotype(normal=[('dil_conv_3x3', 0, 2), ('rcab', 1, 2), ('dil_conv_5x5', 0, 3), ('sep_conv_5x5', 1, 3), ('sep_conv_3x3', 1, 4), ('dil_conv_3x3', 0, 4), ('sep_conv_3x3', 2, 5), ('dil_conv_5x5', 3, 5)], normal_concat=range(2, 6), upsampling=[('sub_pixel', 1, 2), ('bilinear', 1, 2), ('bilinear', 1, 3), ('sub_pixel', 0, 3), ('sub_pixel', 3, 4), ('sub_pixel', 3, 4), ('deconvolution', 0, 5), ('nearest', 1, 5)], upsampling_concat=range(2, 6))
 
 # upsampling_position:12
-HNAS_C = Genotype(normal=[('skip_connect', 0, 2), ('rcab', 1, 2), ('dil_conv_5x5', 0, 3), ('sep_conv_3x3', 0, 3), ('sep_conv_5x5', 1, 4), ('rcab', 2, 4), ('dil_conv_5x5', 0, 5), ('sep_conv_5x5', 2, 5)], normal_concat=range(2, 6), upsampling=[('nearest', 1, 2), ('deconvolution', 0, 2), ('bilinear', 0, 3), ('deconvolution', 0, 3), ('area', 1, 4), ('sub_pixel', 3, 4), ('area', 2, 5), ('bilinear', 0, 5)], upsampling_concat=range(2, 6))
-
+# HNAS_C = Genotype(normal=[('skip_connect', 0, 2), ('rcab', 1, 2), ('dil_conv_5x5', 0, 3), ('sep_conv_3x3', 0, 3), ('sep_conv_5x5', 1, 4), ('rcab', 2, 4), ('dil_conv_5x5', 0, 5), ('sep_conv_5x5', 2, 5)], normal_concat=range(2, 6), upsampling=[('nearest', 1, 2), ('deconvolution', 0, 2), ('bilinear', 0, 3), ('deconvolution', 0, 3), ('area', 1, 4), ('sub_pixel', 3, 4), ('area', 2, 5), ('bilinear', 0, 5)], upsampling_concat=range(2, 6))
+HNAS_C = Genotype(normal=[('rcab', 1, 2), ('skip_connect', 1, 2), ('dil_conv_3x3', 1, 3), ('skip_connect', 0, 3), ('dil_conv_5x5', 0, 4), ('rcab', 3, 4), ('dil_conv_5x5', 4, 5), ('dil_conv_3x3', 0, 5)], normal_concat=range(2, 6), upsampling=[('sub_pixel', 0, 2), ('nearest', 1, 2), ('deconvolution', 2, 3), ('nearest', 0, 3), ('deconvolution', 3, 4), ('sub_pixel', 2, 4), ('bilinear', 0, 5), ('area', 0, 5)], upsampling_concat=range(2, 6))
 
 
 
