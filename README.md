@@ -40,3 +40,15 @@ The HNAS work can be splitted into four procedures:
     CUDA_VISIBLE_DEVICES=0 python main.py --data_test Set5+Set14+B100+Urban100+Manga109 --data_range 801-900 --scale 2 --pre_train  ../experiment/retrain_result/model/model_best.pt  --test_only --self_ensemble --save_results --save result_arch/ --train_controller False --model arch --genotype HNAS_A --layer 12 --init_channels 64 --upsampling_Pos 9
     ```
 
+## Citation
+
+If you use any part of this code in your research, please cite our paper:
+
+```
+@article{guo2020hierarchical,
+  title={HNAS: Hierarchical Neural Architecture Search for Single Image Super-Resolution},
+  author={Guo, Yong and Luo, Yongsheng and He, Zhenhao and Huang, Jin and Chen, Jian},
+  journal={arXiv preprint arXiv:2003.04619},
+  year={2020}
+}
+```
