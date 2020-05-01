@@ -11,6 +11,7 @@ import os
 from model import common
 from option import args
 
+
 def make_model(args, parent=False):
     return NASNetwork(args)
 
@@ -155,7 +156,7 @@ class ArchMaster(nn.Module):
         self.hid_attn_position = nn.Linear(self.controller_hid, self.attention_hid, bias=False)
         self.v_attn_position = nn.Linear(self.controller_hid, 1, bias=False)
         self.w_soft_position = nn.Linear(self.controller_hid, self.n_layers)
-        self.lstm_position = nn.LSTMCell(self.controller_hid*2, self.controller_hid)
+        self.lstm_position = nn.LSTMCell(self.controller_hid * 2, self.controller_hid)
 
         self.reset_parameters()
         self.static_init_hidden = utils.keydefaultdict(self.init_hidden)
@@ -308,7 +309,7 @@ class ArchMaster(nn.Module):
         zeros = torch.zeros(batch_size, self.controller_hid)
         hidden = (utils.get_variable(zeros, self.device, requires_grad=False).cuda(),
                   utils.get_variable(zeros.clone(), self.device, requires_grad=False).cuda())
-        inputs = torch.cat([hx_normal,hx_upsampling],1).cuda()
+        inputs = torch.cat([hx_normal, hx_upsampling], 1).cuda()
         hx, cx = self.lstm_position(inputs, hidden)
         query = self.node_op_hidden_position.weight.index_select(
             0, self.query_index_position[0:self.n_layers]
@@ -328,7 +329,8 @@ class ArchMaster(nn.Module):
         log_p_position += selected_log_p
         entropy_position += -(log_probs * probs).sum()
 
-        return  arch_normal,log_p, entropy,  arch_upsampling,log_p_upsampling,entropy_upsampling,   action.cpu().numpy()[0],log_p_position, entropy_position
+        return arch_normal, log_p, entropy, arch_upsampling, log_p_upsampling, entropy_upsampling, action.cpu().numpy()[
+            0], log_p_position, entropy_position
 
 
 class NASNetwork(nn.Module):
@@ -375,19 +377,22 @@ class NASNetwork(nn.Module):
 
         C_prev_prev, C_prev, C_curr = C_curr, C_curr, C
         self.cells = nn.ModuleList()
+        self.upsampling_cells = nn.ModuleList()
         upsample_prev = False
-
 
         for i in range(layers):
             upsample = False
-            cell = NASCell(steps, self._device, multiplier, C_prev_prev, C_prev, C_curr, upsample, upsample_prev, loose_end=self.loose_end)
+            cell = NASCell(steps, self._device, multiplier, C_prev_prev, C_prev, C_curr, upsample, upsample_prev,
+                           loose_end=self.loose_end)
             upsample_prev = upsample
             self.cells += [cell]
             C_prev_prev, C_prev = C_prev, multiplier * C_curr
 
-        upsample = True
-        self.upsampling_cell = NASCell(steps, self._device, multiplier, C_prev_prev, C_prev, C_curr, upsample,
-                                   upsample_prev, loose_end=self.loose_end)
+        for i in range(layers):
+            upsample = True
+            upsampling_cell = NASCell(steps, self._device, multiplier, C_prev_prev, C_prev, C_curr, upsample,
+                                      upsample_prev, loose_end=self.loose_end)
+            self.upsampling_cells += [upsampling_cell]
         scale = args.scale[0]
         self.final_conv = conv(C_prev, args.n_colors, 3)
         self._initialize_archmaster()
@@ -404,7 +409,6 @@ class NASNetwork(nn.Module):
                                              self.split_fc)
         self._pruner_parameters = list(self.arch_normal_pruner.parameters())
 
-
     def _inner_forward(self, input, arch_normal, arch_upsampling, upsampling_position):
         try:
             input = self.sub_mean(input)
@@ -415,14 +419,14 @@ class NASNetwork(nn.Module):
         for i in range(self.n_layers):
             if i == upsampling_position:
                 archs = arch_upsampling
-                s0, s1 = self.upsampling_cell(s0, s1, archs), self.upsampling_cell(s0, s1, archs)
+                s0, s1 = self.upsampling_cells[i](s0, s1, archs), self.upsampling_cells[i](s0, s1, archs)
             else:
                 archs = arch_normal
                 s0, s1 = s1, self.cells[i](s0, s1, archs)
         logits = self.final_conv(s1)
         logits = self.add_mean(logits)
         return logits
-    
+
     def _test_acc(self, test_queue, arch_normal, arch_upsampling):
         top1 = utils.AvgrageMeter()
         for step, (test_input, test_target) in enumerate(test_queue):
@@ -435,7 +439,7 @@ class NASNetwork(nn.Module):
         return top1.avg
 
     def arch_forward(self, valid_input):
-        arch_normal, arch_normal_logP, arch_normal_entropy, arch_upsampling, arch_upsampling_logP, arch_upsampling_entropy, position, log_p_position, entropy_position\
+        arch_normal, arch_normal_logP, arch_normal_entropy, arch_upsampling, arch_upsampling_logP, arch_upsampling_entropy, position, log_p_position, entropy_position \
             = self.arch_normal_master.forward()
         logits = self._inner_forward(valid_input, arch_normal, arch_upsampling, position)
         return logits, arch_normal, arch_normal_logP, arch_normal_entropy, arch_upsampling, arch_upsampling_logP, arch_upsampling_entropy, position, log_p_position, entropy_position
@@ -483,4 +487,4 @@ class NASNetwork(nn.Module):
 
     def save_arch_to_pdf(self, suffix):
         genotype = arch_to_genotype(self.cur_normal_arch, self.cur_upsampling_arch, self._steps, "COMPACT")
-        return genotype,self.upsampling_position
+        return genotype, self.upsampling_position
